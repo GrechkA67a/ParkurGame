@@ -1,0 +1,12 @@
+[
+  {"type":"click","selector":"#startBtn"},
+  {"type":"focus","selector":"#course"},
+  {"type":"key","key":"ArrowRight"},
+  {"type":"click","selector":"#ghostBtn"},
+  {"type":"click","selector":"#genBtn"},
+  {"type":"click","selector":"#suitSwatches .swatch:nth-child(2)"},
+  {"type":"click","selector":"#trailOpts .opt[data-trail='dust']"},
+  {"type":"click","selector":"#helmOpts .opt[data-helm='1']"},
+  {"type":"click","selector":"#tabSeason"},
+  {"type":"assert","selector":"#tabSeason","property":"text","equals":"Сезон"}
+]

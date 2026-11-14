@@ -1,0 +1,1589 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Паркур-арена — 3D-платформер: wall-run, slide, крюк и призрак лучшего забега</title>
+<meta name="description" content="Паркур-арена — концепт 3D-платформера: бег по крышам, wall-run, slide, grapple-hook, тайм-триалы с призраком, процедурные трассы, редактор уровней, ежедневные челленджи и кооп «догони друга». Демо-забег прямо в браузере.">
+<meta name="theme-color" content="#ece7df">
+<style>
+:root{
+  --ink:#14161a;
+  --ink-soft:#3a3a3c;
+  --paper:#ece7df;
+  --paper-hi:#f7f4ef;
+  --rule:rgba(20,22,26,.18);
+  --rule-soft:rgba(20,22,26,.09);
+  --red:#e23a1f;
+  --red-dk:#c02d15;
+  --blue:#28456d;
+  --muted:#6b6862;
+  --cond:"Bahnschrift","DIN Alternate","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;line-height:1.55;overflow-x:clip;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,p{margin:0}
+button{font-family:inherit}
+.mono{font-family:Consolas,ui-monospace,"SFMono-Regular",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(18px,4vw,56px)}
+a{color:inherit;text-decoration:none}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:30;background:rgba(236,231,223,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.hdr-in{display:flex;align-items:center;gap:26px;min-height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--cond);font-weight:700;font-size:18px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.logo-mark{width:26px;height:16px;position:relative;display:block}
+.logo-mark::before,.logo-mark::after{content:"";position:absolute;width:10px;height:16px;background:var(--ink);transform:skewX(-22deg)}
+.logo-mark::before{left:2px}
+.logo-mark::after{left:15px;background:var(--red)}
+.nav{display:flex;gap:24px;margin-left:auto}
+.nav a{font-size:13.5px;letter-spacing:.03em;color:var(--ink-soft);padding:6px 0;border-bottom:1px solid transparent}
+.nav a:hover,.nav a:focus-visible{color:var(--red);border-bottom-color:var(--red)}
+.hdr .btn{margin-left:6px;white-space:nowrap;flex-shrink:0}
+@media (max-width:900px){.nav{display:none}.hdr .btn{margin-left:auto}}
+@media (max-width:470px){.hdr .btn{padding:10px 12px;font-size:11px;letter-spacing:.05em}}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px 20px;border:1px solid var(--ink);background:transparent;color:var(--ink);
+  font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;transition:background .16s ease,color .16s ease,transform .16s ease,border-color .16s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn-red{background:var(--red);border-color:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-dk);border-color:var(--red-dk)}
+.btn-ghost{border-color:var(--rule);color:var(--ink-soft)}
+.btn-ghost:hover{border-color:var(--ink);color:var(--ink)}
+.btn-sm{padding:9px 14px;font-size:12px}
+
+/* hero */
+.hero{padding:clamp(30px,5vw,58px) 0 0;position:relative;overflow:hidden}
+.hero-top{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:12px}
+.hero h1{
+  font-family:var(--cond);font-weight:700;text-transform:uppercase;
+  font-size:clamp(56px,13vw,172px);line-height:.82;letter-spacing:-.01em;
+  margin:clamp(18px,3.5vw,38px) 0 0;
+}
+.hero h1 .l2{display:block;padding-left:clamp(0px,7vw,120px);position:relative}
+.hero h1 .l2 .tick{display:inline-block;width:clamp(30px,7vw,86px);height:clamp(10px,1.6vw,20px);background:var(--red);transform:skewX(-24deg);margin-right:clamp(10px,1.6vw,22px);vertical-align:middle;position:relative;top:-.06em}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(20px,4vw,60px);align-items:start;margin-top:clamp(22px,3.6vw,42px)}
+.hero-lead{font-size:clamp(17px,1.55vw,20px);line-height:1.5;color:var(--ink-soft);max-width:46ch}
+.hero-lead strong{color:var(--ink);font-weight:600}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.hero-facts{border-top:1px solid var(--ink);margin:0;padding:0;list-style:none}
+.hero-facts li{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.hero-facts li b{font-family:var(--cond);font-size:19px;font-weight:600;letter-spacing:.02em}
+.hero-facts li span{color:var(--muted);text-align:right}
+.route-wrap{margin:clamp(28px,4vw,46px) 0 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--paper-hi)}
+.route-svg{display:block;width:100%;height:auto}
+.route-line{animation:dashmove 26s linear infinite}
+@keyframes dashmove{to{stroke-dashoffset:-320}}
+.route-note{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--rule-soft)}
+@media (max-width:880px){.hero-grid{grid-template-columns:1fr}}
+
+/* sections */
+.sec{padding:clamp(44px,6.5vw,92px) 0;border-top:1px solid var(--rule)}
+.sec-head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(18px,4vw,64px);align-items:end;margin-bottom:clamp(24px,3.6vw,44px)}
+.sec h2{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(30px,4.6vw,54px);line-height:.96;letter-spacing:-.005em;margin-top:10px}
+.sec .lead{color:var(--ink-soft);max-width:54ch;font-size:16.5px}
+.kicker{display:flex;align-items:center;gap:10px}
+.kicker .num{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:20px;background:var(--ink);color:var(--paper-hi);font-size:11px;letter-spacing:.06em;padding:0 5px}
+@media (max-width:880px){.sec-head{grid-template-columns:1fr}}
+
+/* move list */
+.moves{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.move{display:grid;grid-template-columns:170px minmax(0,1fr) 190px;gap:clamp(14px,3vw,44px);padding:20px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.move-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.move h3{font-family:var(--cond);font-size:22px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;line-height:1}
+.move p{color:var(--ink-soft);max-width:58ch;font-size:15.5px}
+.move-tag{font-family:Consolas,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:right}
+kbd{display:inline-block;font-family:Consolas,ui-monospace,monospace;font-size:11px;line-height:1;letter-spacing:.06em;padding:4px 6px;border:1px solid var(--ink-soft);border-bottom-width:2px;background:var(--paper-hi);color:var(--ink)}
+@media (max-width:820px){.move{grid-template-columns:1fr auto;gap:8px 16px}.move p{grid-column:1/-1}.move-tag{text-align:right;align-self:start}}
+
+/* demo stage */
+.stage{border:1px solid var(--ink);background:var(--paper-hi)}
+.hud{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,2.4vw,28px);padding:12px 16px;border-bottom:1px solid var(--rule)}
+.hud-cell{display:flex;align-items:baseline;gap:9px}
+.hud-label{font-family:Consolas,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hud-val{font-family:var(--cond);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:.02em}
+.hud-val.is-best{color:var(--red)}
+.hud-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.hud-toggle{border:1px solid var(--rule);background:transparent;color:var(--ink);font-family:Consolas,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;cursor:pointer}
+.hud-toggle[aria-pressed="true"]{background:var(--ink);color:var(--paper-hi);border-color:var(--ink)}
+.hud-toggle:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.canvas-shell{position:relative;background:#f7f4ef}
+#course{display:block;width:100%;height:auto;touch-action:none;outline:none}
+#course:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+.canvas-msg{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:rgba(20,22,26,.92);color:#fff;padding:9px 16px;
+  font-family:Consolas,monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  pointer-events:none;transition:opacity .25s ease,visibility .25s ease;text-align:center;max-width:min(88%,420px);
+}
+.canvas-msg.is-hidden{opacity:0;visibility:hidden}
+.touch{display:none;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--rule)}
+.touch button{flex:1 1 auto;min-width:64px;padding:13px 10px;border:1px solid var(--ink);background:var(--paper);font-family:Consolas,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);cursor:pointer;touch-action:none}
+.touch button:active{background:var(--ink);color:var(--paper-hi)}
+.touch button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+@media (max-width:860px),(hover:none){.touch{display:flex}}
+.stage-foot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--rule);background:var(--paper)}
+.hint{margin:0}
+
+/* generator */
+.gen{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);border:1px solid var(--ink);background:var(--paper-hi)}
+.gen-visual{padding:16px;border-right:1px solid var(--ink);display:flex;align-items:center}
+#genSvg{display:block;width:100%;height:auto}
+.gen-panel{padding:clamp(16px,2.5vw,26px);display:flex;flex-direction:column;gap:14px}
+.gen-seed{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:10px}
+.gen-seed b{font-family:Consolas,monospace;font-size:15px;letter-spacing:.06em}
+.gen-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:0}
+.gen-stats div{display:flex;flex-direction:column;gap:2px}
+.gen-stats dt{font-family:Consolas,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.gen-stats dd{margin:0;font-family:var(--cond);font-size:21px;font-weight:600;letter-spacing:.02em}
+.gen-panel .btn{align-self:flex-start}
+@media (max-width:860px){.gen{grid-template-columns:1fr}.gen-visual{border-right:0;border-bottom:1px solid var(--ink)}}
+
+/* editor list */
+.editor{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,54px);margin-top:clamp(26px,4vw,44px)}
+.editor h3{font-family:var(--cond);text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin-bottom:12px}
+.feats{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.feats li{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:13px 0;border-bottom:1px solid var(--rule);font-size:15.5px;color:var(--ink-soft)}
+.feats li b{color:var(--ink);font-weight:600;display:block;margin-bottom:1px}
+.feats .fi{font-family:Consolas,monospace;font-size:11px;color:var(--red);padding-top:3px;letter-spacing:.06em}
+@media (max-width:820px){.editor{grid-template-columns:1fr}}
+
+/* challenges */
+.chal-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--rule);padding:12px 16px;background:var(--paper-hi);margin-bottom:20px}
+.chal-top .clock{font-family:var(--cond);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{border:1px solid var(--rule);background:var(--paper-hi);padding:18px;display:flex;flex-direction:column;gap:10px}
+.card-k{display:flex;justify-content:space-between;gap:10px;font-family:Consolas,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.card h3{font-size:16.5px;font-weight:650;line-height:1.28;letter-spacing:.005em}
+.card p{font-size:13.5px;color:var(--muted);margin-top:auto}
+.bar{height:5px;background:var(--rule-soft);position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--red);display:block}
+@media (max-width:820px){.cards{grid-template-columns:1fr}}
+
+/* leaderboard */
+.board{margin-top:26px;border:1px solid var(--ink);background:var(--paper-hi)}
+.board-tabs{display:flex;border-bottom:1px solid var(--ink)}
+.board-tabs button{
+  flex:1;padding:11px 8px;background:transparent;border:0;border-right:1px solid var(--rule);
+  font-family:Consolas,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;
+}
+.board-tabs button:last-child{border-right:0}
+.board-tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper-hi)}
+.board-tabs button:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-family:Consolas,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.num{font-family:var(--cond);font-size:17px;font-weight:600;letter-spacing:.02em}
+td .rk{display:inline-block;min-width:22px;font-family:Consolas,monospace;font-size:12px;color:var(--muted)}
+tbody tr.me td{background:rgba(226,58,31,.08)}
+.note{margin-top:12px;font-size:12.5px;color:var(--muted)}
+
+/* skins */
+.skin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center}
+.skin-stage{border:1px solid var(--ink);background:var(--paper-hi);display:grid;place-items:center;padding:20px;min-height:340px;position:relative;overflow:hidden}
+.skin-stage::before{content:"";position:absolute;inset:14px;border:1px solid var(--rule-soft);pointer-events:none}
+#skinSvg{display:block;width:min(240px,72%);height:auto;position:relative}
+.skin-controls{display:flex;flex-direction:column;gap:18px}
+.skin-row{display:flex;flex-direction:column;gap:8px}
+.skin-row .mono{font-size:10.5px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:38px;height:38px;border:1px solid rgba(20,22,26,.3);cursor:pointer;padding:0;position:relative;background:var(--paper)}
+.swatch::after{content:"";position:absolute;inset:4px;background:var(--c,#14161a)}
+.swatch[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--paper) inset,0 0 0 3px var(--ink)}
+.swatch:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.opt{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--rule);background:transparent;color:var(--ink);font-family:Consolas,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--ink);color:var(--paper-hi);border-color:var(--ink)}
+.opt:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.opt-row{display:flex;gap:8px;flex-wrap:wrap}
+.skin-note{font-size:13.5px;color:var(--muted);border-top:1px solid var(--rule);padding-top:12px}
+@media (max-width:820px){.skin{grid-template-columns:1fr}}
+
+/* coop */
+.coop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.coop-step{padding:22px clamp(14px,2vw,24px);border-right:1px solid var(--rule);position:relative}
+.coop-step:last-child{border-right:0}
+.coop-step .n{font-family:Consolas,monospace;font-size:11px;color:var(--red);letter-spacing:.1em}
+.coop-step h3{font-family:var(--cond);font-size:20px;text-transform:uppercase;letter-spacing:.03em;margin:8px 0 6px}
+.coop-step p{font-size:14.5px;color:var(--ink-soft)}
+@media (max-width:820px){.coop{grid-template-columns:1fr}.coop-step{border-right:0;border-bottom:1px solid var(--rule)}}
+
+/* final cta */
+.final{border-top:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:clamp(40px,6vw,80px) 0}
+.final h2{font-family:var(--cond);text-transform:uppercase;font-size:clamp(30px,5vw,62px);line-height:.95;letter-spacing:-.005em;margin:0}
+.final-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(20px,4vw,60px);align-items:end}
+.final p{color:#b9b3a9;max-width:44ch;margin-top:14px}
+.final .btn-red{border-color:var(--red)}
+.final .btn-line{border-color:rgba(247,244,239,.35);color:var(--paper)}
+.final .btn-line:hover{border-color:var(--paper);background:rgba(247,244,239,.08)}
+.final-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.final .note{color:#8e8880}
+@media (max-width:820px){.final-grid{grid-template-columns:1fr}.final-cta{justify-content:flex-start}}
+
+.foot{padding:26px 0 40px;background:var(--ink);color:#8e8880;border-top:1px solid rgba(247,244,239,.12)}
+.foot-in{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12.5px}
+.foot .mono{color:#8e8880}
+
+@media (prefers-reduced-motion:reduce){
+  .route-line{animation:none}
+  .btn:hover{transform:none}
+  *{scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a class="logo" href="#top" aria-label="Паркур-арена — на главную">
+      <span class="logo-mark" aria-hidden="true"></span>
+      Паркур-арена
+    </a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#demo">Демо</a>
+      <a href="#mechanics">Мувсет</a>
+      <a href="#tracks">Трассы</a>
+      <a href="#challenges">Челленджи</a>
+      <a href="#skins">Скины</a>
+      <a href="#coop">Кооп</a>
+    </nav>
+    <button class="btn btn-red btn-sm" id="topCta" type="button">Пробежать трассу</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-top">
+        <span class="mono">3D-платформер · PvP и PvE · редактор трасс</span>
+        <span class="mono">концепт-страница · демо работает в браузере</span>
+      </div>
+
+      <h1>
+        <span class="l1">Паркур</span>
+        <span class="l2"><i class="tick" aria-hidden="true"></i>Арена</span>
+      </h1>
+
+      <div class="hero-grid">
+        <div>
+          <p class="hero-lead">
+            Бег по крышам, <strong>wall-run</strong> по бетону, <strong>slide</strong> под трубой
+            и <strong>grapple-hook</strong> через провал. Соревнуйся с призраком своего лучшего
+            забега, собирай трассы в редакторе и зови друга на дуэль «догони меня».
+          </p>
+          <div class="hero-cta">
+            <button class="btn btn-red" id="heroPlay" type="button">Сыграть забег</button>
+            <a class="btn btn-ghost" href="#mechanics">Разобрать мувсет</a>
+          </div>
+        </div>
+        <ul class="hero-facts">
+          <li><b>6 движений</b><span>бег, прыжок, wall-run, slide, крюк, воздух</span></li>
+          <li><b>1 призрак</b><span>лучший забег на каждой трассе</span></li>
+          <li><b>2 игрока</b><span>кооп «догони друга» с форой</span></li>
+          <li><b>∞ трасс</b><span>процедурная генерация + редактор</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="route-wrap">
+      <div class="wrap" style="padding-top:10px;padding-bottom:10px">
+        <svg class="route-svg" viewBox="0 0 1200 250" role="img" aria-label="Схема трассы: старт, разгон, прыжок на выступ, wall-run по стене, slide под трубой, бросок крюка через провал, финиш.">
+          <g stroke="#14161a" stroke-width="1" opacity=".16">
+            <line x1="0" y1="214" x2="1200" y2="214"/>
+            <line x1="0" y1="140" x2="1200" y2="140"/>
+            <line x1="0" y1="66" x2="1200" y2="66"/>
+          </g>
+          <g fill="#14161a" opacity=".9">
+            <rect x="20" y="214" width="150" height="4"/>
+            <rect x="205" y="186" width="120" height="4"/>
+            <rect x="368" y="120" width="10" height="98" opacity=".55"/>
+            <rect x="418" y="150" width="120" height="4"/>
+            <rect x="566" y="214" width="150" height="4"/>
+            <rect x="762" y="170" width="150" height="4"/>
+            <rect x="960" y="206" width="200" height="4"/>
+          </g>
+          <path class="route-line" d="M20,208 H168 V180 H322 V150 H372 V112 H392 V150 H412 V144 H536 V208 H712 V164 H900 V200 H1160" fill="none" stroke="#e23a1f" stroke-width="2.4" stroke-dasharray="9 9" stroke-linecap="round"/>
+          <g fill="#e23a1f">
+            <circle cx="20" cy="208" r="5"/>
+            <circle cx="536" cy="208" r="5"/>
+            <circle cx="1160" cy="200" r="5"/>
+          </g>
+          <g font-family="Consolas, ui-monospace, monospace" font-size="10.5" fill="#6b6862" letter-spacing="1.2">
+            <text x="20" y="236">СТАРТ</text>
+            <text x="150" y="176">01 · ПРЫЖОК</text>
+            <text x="300" y="104">02 · WALL-RUN</text>
+            <text x="452" y="140">03 · SLIDE</text>
+            <text x="640" y="200">04 · КРЮК</text>
+            <text x="1020" y="192">05 · ФИНИШ</text>
+          </g>
+        </svg>
+        <div class="route-note">
+          <span class="mono">дистанция 240 м · перепад 18 м · 3 чекпоинта</span>
+          <span class="mono">средний забег — 42 с</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="demo">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker mono"><span class="num">01</span> Трасса «Бетон-01»</p>
+          <h2>Пройди трассу прямо здесь</h2>
+        </div>
+        <p class="lead">
+          Управление как в игре: разгон, прыжок, отталкивание от стены, скольжение под трубой
+          и крюк через провал. После финиша включится призрак — твой лучший забег сохранится
+          в браузере.
+        </p>
+      </div>
+
+      <div class="stage">
+        <div class="hud">
+          <div class="hud-cell">
+            <span class="hud-label">Время</span>
+            <span class="hud-val" id="timeOut">0.00</span>
+          </div>
+          <div class="hud-cell">
+            <span class="hud-label">Лучший</span>
+            <span class="hud-val" id="bestOut">—</span>
+          </div>
+          <div class="hud-cell">
+            <span class="hud-label">Призрак</span>
+            <button class="hud-toggle" id="ghostBtn" type="button" aria-pressed="true">вкл</button>
+          </div>
+          <div class="hud-actions">
+            <button class="btn btn-red btn-sm" id="startBtn" type="button">Старт</button>
+            <button class="btn btn-ghost btn-sm" id="resetBtn" type="button">Рестарт · R</button>
+          </div>
+        </div>
+
+        <div class="canvas-shell">
+          <canvas id="course" width="1000" height="420" tabindex="0"
+            aria-label="Игровая трасса: платформы, стена для wall-run, ворота для slide, якорь крюка и финиш. Управление: стрелки или A и D — бег, пробел — прыжок, Shift — slide, E — крюк."></canvas>
+          <p class="canvas-msg" id="courseMsg">Нажми «Старт» или стрелку вправо</p>
+        </div>
+
+        <div class="touch" id="touchPad">
+          <button type="button" data-key="left" aria-label="Бежать влево">←</button>
+          <button type="button" data-key="right" aria-label="Бежать вправо">→</button>
+          <button type="button" data-key="jump" aria-label="Прыжок">Прыжок</button>
+          <button type="button" data-key="slide" aria-label="Скольжение">Slide</button>
+          <button type="button" data-key="grapple" aria-label="Крюк">Крюк</button>
+        </div>
+
+        <div class="stage-foot">
+          <p class="hint mono">WASD / ← → бег · SPACE прыжок и wall-jump · SHIFT slide · E крюк · R рестарт</p>
+          <p class="hint mono">лучшее время хранится локально</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="mechanics">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker mono"><span class="num">02</span> Мувсет</p>
+          <h2>Шесть движений, которые решают забег</h2>
+        </div>
+        <p class="lead">
+          Никаких кнопок «сделать трюк». Всё держится на физике, инерции и тайминге: скорость
+          копится между платформами, а ошибка на краю стоит секунды.
+        </p>
+      </div>
+
+      <ul class="moves">
+        <li class="move">
+          <div class="move-name"><h3>Бег</h3></div>
+          <p>Разгон до 9 м/с с сохранением инерции: на следующую платформу ты прилетаешь уже на скорости, а не с места. Тормозить приходится заранее.</p>
+          <div class="move-tag"><kbd>A</kbd> <kbd>D</kbd> · ground</div>
+        </li>
+        <li class="move">
+          <div class="move-name"><h3>Прыжок</h3></div>
+          <p>Прощает промах на краю: 120 мс coyote-time после схода с платформы ещё считаются опорой. Со стены прыжок выше и уводит в сторону.</p>
+          <div class="move-tag"><kbd>SPACE</kbd> · air</div>
+        </li>
+        <li class="move">
+          <div class="move-name"><h3>Wall-run</h3></div>
+          <p>Держаться за вертикаль можно меньше секунды — хватает, чтобы подняться вдоль стены, обогнуть выступ и уйти наверх прыжком.</p>
+          <div class="move-tag"><kbd>SPACE</kbd> у стены · vertical</div>
+        </li>
+        <li class="move">
+          <div class="move-name"><h3>Slide</h3></div>
+          <p>Под низкими трубами проходит только скольжение: силуэт ниже на 18 см, а на выходе скорость выше на треть. Слайд в воздухе не работает.</p>
+          <div class="move-tag"><kbd>SHIFT</kbd> · low profile</div>
+        </li>
+        <li class="move">
+          <div class="move-name"><h3>Grapple-hook</h3></div>
+          <p>Крюк цепляет ближайший якорь в радиусе и тянет по дуге через провал. Один якорь — один бросок: переигровка стоит полсекунды.</p>
+          <div class="move-tag"><kbd>E</kbd> · traversal</div>
+        </li>
+        <li class="move">
+          <div class="move-name"><h3>Air control</h3></div>
+          <p>В полёте есть 40% наземного ускорения: этого хватает, чтобы подправить курс на перила, но не развернуться и не «долететь» до платформы.</p>
+          <div class="move-tag"><kbd>A</kbd> <kbd>D</kbd> · in flight</div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="tracks">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker mono"><span class="num">03</span> Трассы</p>
+          <h2>Трассы, которые собирает игрок</h2>
+        </div>
+        <p class="lead">
+          Процедурный генератор даёт заготовку за секунду, редактор — полный контроль.
+          Каждая опубликованная трасса приходит с призраком автора: видно, как её проходить.
+        </p>
+      </div>
+
+      <div class="gen">
+        <div class="gen-visual">
+          <svg id="genSvg" viewBox="0 0 620 260" role="img" aria-label="Сгенерированная трасса: последовательность платформ, стены и якорей крюка."></svg>
+        </div>
+        <div class="gen-panel">
+          <div class="gen-seed">
+            <span class="mono">сид трассы</span>
+            <b id="seedOut">AR-0000</b>
+          </div>
+          <dl class="gen-stats" id="genStats">
+            <div><dt>дистанция</dt><dd id="statLen">—</dd></div>
+            <div><dt>перепад</dt><dd id="statDrop">—</dd></div>
+            <div><dt>якоря крюка</dt><dd id="statHook">—</dd></div>
+            <div><dt>сложность</dt><dd id="statDiff">—</dd></div>
+          </dl>
+          <button class="btn btn-red btn-sm" id="genBtn" type="button">Сгенерировать трассу</button>
+          <p class="hint mono">тот же сид всегда даёт ту же трассу</p>
+        </div>
+      </div>
+
+      <div class="editor">
+        <div>
+          <h3>Редактор уровней</h3>
+          <ul class="feats">
+            <li><span class="fi">01</span><span><b>Палитра объектов</b>Блоки, стены, трубы, якоря, движущиеся платформы и триггеры чекпоинтов.</span></li>
+            <li><span class="fi">02</span><span><b>Проверка проходимости</b>Перед публикацией редактор прогоняет трассу ботом: если он не дошёл до финиша, уровень не выйдет в ленту.</span></li>
+            <li><span class="fi">03</span><span><b>Призрак автора</b>Запись забега прикладывается к трассе — новичок сразу видит, где проходит линия.</span></li>
+            <li><span class="fi">04</span><span><b>Сетка 1 м и тайминги</b>Привязка к метру, копирование секций, тест с любой точки без перезапуска.</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Процедурная генерация</h3>
+          <ul class="feats">
+            <li><span class="fi">05</span><span><b>Сид и настройки</b>Длина, вертикальность, плотность стен и якорей — три ползунка до первой заготовки.</span></li>
+            <li><span class="fi">06</span><span><b>Оценка сложности</b>Генератор считает перепад высот и число обязательных трюков и ставит метку от 1 до 5.</span></li>
+            <li><span class="fi">07</span><span><b>Сезонные подборки</b>Каждую неделю лента обновляется трассами сообщества с общим сидом сезона.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="challenges">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker mono"><span class="num">04</span> Челленджи и сезоны</p>
+          <h2>Каждый день — новый повод вернуться</h2>
+        </div>
+        <p class="lead">
+          Три ежедневных задания, недельный сезонный лидерборд и трасса дня для всех.
+          Прогресс обнуляется в 03:00 по Москве.
+        </p>
+      </div>
+
+      <div class="chal-top">
+        <span class="mono">до сброса ежедневных</span>
+        <span class="clock" id="resetClock">--:--:--</span>
+        <span class="mono">сезон 04 · «Крыши» · 6 дней</span>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <div class="card-k"><span>задание дня</span><span>★★☆</span></div>
+          <h3>Три забега подряд без падения</h3>
+          <p>1 / 3 · без рестарта внутри серии</p>
+          <div class="bar"><i style="width:33%"></i></div>
+        </article>
+        <article class="card">
+          <div class="card-k"><span>задание дня</span><span>★★★</span></div>
+          <h3>2300 очков стиля за один забег</h3>
+          <p>1420 / 2300 · стиль капает за связки трюков</p>
+          <div class="bar"><i style="width:62%"></i></div>
+        </article>
+        <article class="card">
+          <div class="card-k"><span>трасса дня</span><span>★★★★</span></div>
+          <h3>«Бетон-01» быстрее 14 секунд</h3>
+          <p>лучший забег — 15.62</p>
+          <div class="bar"><i style="width:11%"></i></div>
+        </article>
+      </div>
+
+      <div class="board">
+        <div class="board-tabs" role="tablist" aria-label="Лидерборд">
+          <button role="tab" id="tabDay" aria-selected="true" aria-controls="boardBody" data-board="day" type="button">Сегодня</button>
+          <button role="tab" id="tabSeason" aria-selected="false" aria-controls="boardBody" data-board="season" type="button">Сезон</button>
+          <button role="tab" id="tabFriends" aria-selected="false" aria-controls="boardBody" data-board="friends" type="button">Друзья</button>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr><th scope="col">#</th><th scope="col">игрок</th><th scope="col">трасса</th><th scope="col" class="num">время</th><th scope="col" class="num">стиль</th></tr>
+            </thead>
+            <tbody id="boardBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">Демо-таблица: имена и результаты вымышлены и показывают вид интерфейса. Сервера у этой страницы нет.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="skins">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker mono"><span class="num">05</span> Скины</p>
+          <h2>Собери своего раннера</h2>
+        </div>
+        <p class="lead">
+          Костюм, след и шлем — только внешний вид. Никаких бонусов к скорости: в тайм-триале
+          решает траектория, а не гардероб.
+        </p>
+      </div>
+
+      <div class="skin">
+        <div class="skin-stage">
+          <svg id="skinSvg" viewBox="0 0 200 300" role="img" aria-label="Предпросмотр персонажа: костюм, шлем и след забега.">
+            <polyline id="skTrail" points="28,244 44,232 58,246 74,234 88,248" fill="none" stroke="#e23a1f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+            <g id="skFigure" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path id="skLegs" d="M93,168 L78,220 L66,238 M107,168 L123,220 L136,236" stroke="#14161a" stroke-width="13"/>
+              <path id="skArms" d="M85,106 L68,142 L58,150 M115,106 L132,140 L142,132" stroke="#14161a" stroke-width="12"/>
+              <path id="skTorso" d="M86,98 Q100,91 114,98 L119,150 Q121,168 107,168 L93,168 Q79,168 81,150 Z" fill="#14161a" stroke="none"/>
+              <path id="skStripe" d="M100,100 L100,162" stroke="#e23a1f" stroke-width="5"/>
+              <circle id="skHead" cx="100" cy="74" r="19" fill="#f7f4ef" stroke="#14161a" stroke-width="5"/>
+              <path id="skHelm" d="M81,72 A19,19 0 0 1 119,72 L119,62 A19,19 0 0 0 81,62 Z" fill="#e23a1f" stroke="none" opacity="0"/>
+            </g>
+          </svg>
+        </div>
+        <div class="skin-controls">
+          <div class="skin-row">
+            <span class="mono">костюм</span>
+            <div class="swatches" id="suitSwatches">
+              <button class="swatch" type="button" data-suit="#14161a" style="--c:#14161a" aria-pressed="true" aria-label="Графит"></button>
+              <button class="swatch" type="button" data-suit="#e23a1f" style="--c:#e23a1f" aria-pressed="false" aria-label="Сигнальный красный"></button>
+              <button class="swatch" type="button" data-suit="#28456d" style="--c:#28456d" aria-pressed="false" aria-label="Синий чертёж"></button>
+              <button class="swatch" type="button" data-suit="#3f6b4a" style="--c:#3f6b4a" aria-pressed="false" aria-label="Зелёный мох"></button>
+              <button class="swatch" type="button" data-suit="#c9c1b3" style="--c:#c9c1b3" aria-pressed="false" aria-label="Песочный бетон"></button>
+            </div>
+          </div>
+          <div class="skin-row">
+            <span class="mono">след</span>
+            <div class="opt-row" id="trailOpts">
+              <button class="opt" type="button" data-trail="none" aria-pressed="false">нет</button>
+              <button class="opt" type="button" data-trail="red" aria-pressed="true">красный</button>
+              <button class="opt" type="button" data-trail="dust" aria-pressed="false">пыль</button>
+            </div>
+          </div>
+          <div class="skin-row">
+            <span class="mono">шлем</span>
+            <div class="opt-row" id="helmOpts">
+              <button class="opt" type="button" data-helm="0" aria-pressed="true">без шлема</button>
+              <button class="opt" type="button" data-helm="1" aria-pressed="false">шлем с визором</button>
+            </div>
+          </div>
+          <p class="skin-note">Все скины открываются за забеги и задания сезона. Магазина с платным преимуществом нет.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="coop">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker mono"><span class="num">06</span> Кооп</p>
+          <h2>«Догони друга»</h2>
+        </div>
+        <p class="lead">
+          Два игрока на одной трассе, но с разными задачами: один уходит с форой в восемь секунд,
+          второй видит его призрак в реальном времени и пытается коснуться.
+        </p>
+      </div>
+
+      <div class="coop">
+        <div class="coop-step">
+          <span class="n">01 / ФОРА</span>
+          <h3>Убегающий стартует первым</h3>
+          <p>Восемь секунд и полная свобода маршрута. Ошибка не обнуляет забег — только отдаёт преимущество.</p>
+        </div>
+        <div class="coop-step">
+          <span class="n">02 / ПОГОНЯ</span>
+          <h3>Догоняющий видит призрак</h3>
+          <p>Силуэт соперника показывается с задержкой 80 мс: этого хватает, чтобы читать траекторию, но не чтобы копировать движения.</p>
+        </div>
+        <div class="coop-step">
+          <span class="n">03 / ОЧКО</span>
+          <h3>Касание меняет роли</h3>
+          <p>Коснулся — забрал очко и стал убегающим. Пять минут, три очка или финиш трассы завершают раунд.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap final-grid">
+      <div>
+        <h2>Крыши ждут.<br>Прыгай первым.</h2>
+        <p>Трасса «Бетон-01» уже ждёт наверху страницы. Покажи время — призрак подхватит темп.</p>
+        <p class="note" style="margin-top:18px">Это концепт-страница игры: демо, генератор и кастомизация работают локально в браузере.</p>
+      </div>
+      <div class="final-cta">
+        <button class="btn btn-red" id="finalPlay" type="button">Пробежать трассу</button>
+        <a class="btn btn-line" href="#tracks">Собрать трассу</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>Паркур-арена · концепт</span>
+    <span class="mono">физика, призрак и лидерборд — демонстрационные</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------- helpers ---------------- */
+  var clamp = function (v, a, b) { return v < a ? a : (v > b ? b : v); };
+
+  /* ================= 1. DEMO COURSE ================= */
+  var canvas = document.getElementById('course');
+  var timeOut = document.getElementById('timeOut');
+  var bestOut = document.getElementById('bestOut');
+  var msgEl = document.getElementById('courseMsg');
+  var ghostBtn = document.getElementById('ghostBtn');
+  var startBtn = document.getElementById('startBtn');
+  var resetBtn = document.getElementById('resetBtn');
+
+  if (canvas && canvas.getContext) {
+    var ctx = canvas.getContext('2d');
+    var VW = 1000, VH = 420;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(VW * dpr);
+    canvas.height = Math.round(VH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var INK = '#14161a', RED = '#e23a1f', PAPER = '#f7f4ef', BASE = '#fbf8f3';
+    var WORLD = 2880, FLOOR = 520, FINISH = 2800;
+    var START = { x: 80, y: 330 };
+
+    var SOLIDS = [
+      { x: -120, y: 330, w: 680, h: 220, kind: 'plat' },
+      { x: 640, y: 300, w: 130, h: 250, kind: 'plat' },
+      { x: 790, y: 240, w: 22, h: 90, kind: 'wall' },
+      { x: 830, y: 250, w: 180, h: 300, kind: 'plat' },
+      { x: 1040, y: 330, w: 200, h: 220, kind: 'plat' },
+      { x: 1108, y: 150, w: 38, h: 152, kind: 'gate' },
+      { x: 1300, y: 330, w: 210, h: 220, kind: 'plat' },
+      { x: 1760, y: 290, w: 220, h: 260, kind: 'plat' },
+      { x: 2040, y: 330, w: 260, h: 220, kind: 'plat' },
+      { x: 2316, y: 260, w: 22, h: 70, kind: 'wall' },
+      { x: 2360, y: 300, w: 520, h: 250, kind: 'plat' }
+    ];
+    var ANCHORS = [{ x: 1638, y: 112 }, { x: 2178, y: 104 }];
+
+    var GRAV = 1900, ACC = 2800, AIRACC = 1700, MAXV = 330, JUMPV = 640;
+    var SLIDE_T = 0.45, SLIDE_V = 520;
+
+    var P = {
+      x: START.x, y: START.y, vx: 0, vy: 0, w: 22,
+      slide: 0, onGround: true, wallDir: 0, wallT: 0, wallRem: 0, grip: false,
+      coyote: 0.12, grapT: 0, grapple: null
+    };
+
+    var state = 'idle', timer = 0, rec = [], recT = 0, animT = 0, lastT = 0;
+    var spawn = { x: START.x, y: START.y };
+    var ghostOn = true, flashT = 0, flashText = '';
+
+    function bodyH() { return P.slide > 0 ? 18 : 36; }
+    function overlap(ax, ay, aw, ah, s) {
+      return ax < s.x + s.w && ax + aw > s.x && ay < s.y + s.h && ay + ah > s.y;
+    }
+    function camX() { return clamp(P.x - 380, 0, WORLD - VW); }
+
+    /* --- storage --- */
+    var KEY = 'parkour-arena-best-v1';
+    function loadBest() {
+      try {
+        var raw = window.localStorage.getItem(KEY);
+        if (!raw) return null;
+        var b = JSON.parse(raw);
+        if (b && typeof b.time === 'number' && b.frames && b.frames.length) return b;
+      } catch (e) { }
+      return null;
+    }
+    function saveBest(b) {
+      try { window.localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) { }
+    }
+    var best = loadBest();
+
+    function setMsg(text) {
+      if (!msgEl) return;
+      if (!text) { msgEl.classList.add('is-hidden'); return; }
+      msgEl.textContent = text;
+      msgEl.classList.remove('is-hidden');
+    }
+    function updateBest() {
+      if (bestOut) bestOut.textContent = best ? best.time.toFixed(2) : '—';
+    }
+    updateBest();
+
+    /* --- physics --- */
+    function moveX(dt) {
+      P.x += P.vx * dt;
+      var h = bodyH();
+      for (var i = 0; i < SOLIDS.length; i++) {
+        var s = SOLIDS[i];
+        if (!overlap(P.x - P.w / 2, P.y - h, P.w, h, s)) continue;
+        if (P.vx > 0) P.x = s.x - P.w / 2;
+        else if (P.vx < 0) P.x = s.x + s.w + P.w / 2;
+        P.vx = 0;
+        if (!P.onGround) {
+          P.wallDir = (P.x <= s.x + 1) ? 1 : -1;
+          P.wallT = 0.16;
+        }
+      }
+    }
+
+    function moveY(dt) {
+      P.y += P.vy * dt;
+      var h = bodyH(), grounded = false;
+      for (var i = 0; i < SOLIDS.length; i++) {
+        var s = SOLIDS[i];
+        if (!overlap(P.x - P.w / 2, P.y - h, P.w, h, s)) continue;
+        if (P.vy > 0) { P.y = s.y; P.vy = 0; grounded = true; }
+        else if (P.vy < 0) { P.y = s.y + s.h + h; P.vy = 0.01; }
+      }
+      P.onGround = grounded;
+      if (grounded) {
+        P.wallT = 0; P.grip = false; P.wallRem = 0.5;
+        if (P.grapT <= 0) P.coyote = 0.12;
+        saveSpawn();
+      }
+    }
+
+    function saveSpawn() {
+      var under = null;
+      for (var i = 0; i < SOLIDS.length; i++) {
+        var s = SOLIDS[i];
+        if (s.kind !== 'plat') continue;
+        if (Math.abs(P.y - s.y) > 3) continue;
+        if (P.x < s.x - 6 || P.x > s.x + s.w + 6) continue;
+        if (!under || s.x > under.x) under = s;
+      }
+      if (!under) return;
+      spawn.x = clamp(P.x, under.x + 26, under.x + under.w - 26);
+      spawn.y = under.y;
+    }
+
+    /* --- actions --- */
+    function begin() {
+      if (state === 'run') return;
+      reset(false);
+      state = 'run';
+      timer = 0; rec = []; recT = 0;
+      setMsg(null);
+    }
+
+    function reset(showMessage) {
+      P.x = START.x; P.y = START.y; P.vx = 0; P.vy = 0; P.slide = 0;
+      P.onGround = true; P.wallT = 0; P.wallDir = 0; P.grip = false; P.wallRem = 0.5;
+      P.coyote = 0.12; P.grapT = 0; P.grapple = null;
+      spawn.x = START.x; spawn.y = START.y;
+      state = 'idle'; timer = 0; rec = []; recT = 0; flashT = 0;
+      if (timeOut) { timeOut.textContent = '0.00'; timeOut.classList.remove('is-best'); }
+      if (showMessage === false) setMsg(null);
+      else setMsg('Нажми «Старт» или стрелку вправо');
+      if (best && ghostOn) { /* призрак появится на старте забега */ }
+    }
+
+    function jump() {
+      if (state === 'done') { reset(true); return; }
+      if (state === 'idle') begin();
+      if (P.grapT > 0) return;
+      var dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+      if (P.wallT > 0 && !P.onGround) {
+        P.vy = -620;
+        P.vx = dir !== 0 ? dir * 400 : -P.wallDir * 380;
+        P.wallT = 0; P.grip = false; P.wallRun = false; P.slide = 0;
+        return;
+      }
+      if (P.onGround || P.coyote > 0) {
+        P.vy = -JUMPV; P.onGround = false; P.coyote = 0; P.slide = 0;
+      }
+    }
+
+    function startSlide() {
+      if (state === 'idle') begin();
+      if (P.grapT > 0 || !P.onGround || P.slide > 0) return;
+      var dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+      var d = dir !== 0 ? dir : (P.vx >= 0 ? 1 : -1);
+      P.slide = SLIDE_T;
+      P.vx = d * SLIDE_V;
+    }
+
+    function grapple() {
+      if (state === 'idle') begin();
+      if (P.grapT > 0) return;
+      var px = P.x, py = P.y - bodyH() / 2;
+      var target = null, bestD = 310;
+      for (var i = 0; i < ANCHORS.length; i++) {
+        var a = ANCHORS[i];
+        var d = Math.sqrt((a.x - px) * (a.x - px) + (a.y - py) * (a.y - py));
+        if (d < bestD) { bestD = d; target = a; }
+      }
+      if (!target) { flashText = 'нет якоря в радиусе'; flashT = 1.1; return; }
+      var dx = target.x - px, dy = target.y - py;
+      var len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var speed = 1080;
+      P.vx = dx / len * speed;
+      P.vy = dy / len * speed;
+      P.grapT = Math.max(0.18, Math.min(bestD, 320) / speed);
+      P.grapple = target;
+      P.slide = 0;
+    }
+
+    function finishRun() {
+      state = 'done';
+      var t = timer;
+      if (timeOut) timeOut.textContent = t.toFixed(2);
+      if (!best || t < best.time - 0.004) {
+        best = { time: t, frames: rec.slice(0, 3200) };
+        saveBest(best);
+        if (timeOut) timeOut.classList.add('is-best');
+        setMsg('Финиш ' + t.toFixed(2) + ' с — новый рекорд');
+      } else {
+        setMsg('Финиш ' + t.toFixed(2) + ' с · лучший ' + best.time.toFixed(2));
+      }
+      updateBest();
+    }
+
+    function update(dt) {
+      animT += dt;
+      if (state === 'idle' && (keys.left || keys.right)) begin();
+      if (flashT > 0) {
+        flashT -= dt;
+        if (flashT > 0) setMsg(flashText);
+        else if (state === 'run') setMsg(null);
+      }
+      if (state !== 'run') return;
+
+      timer += dt;
+      var dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+
+      if (P.grapT > 0) {
+        P.grapT -= dt;
+        if (P.grapT <= 0) {
+          P.grapple = null;
+          P.vx = clamp(P.vx * 0.38, -340, 340);
+          P.vy = -210;
+        }
+      } else {
+        if (P.slide > 0) {
+          P.slide -= dt;
+          P.vx += dir * 700 * dt;
+          if (dir === 0) P.vx *= Math.pow(0.45, dt);
+          P.vx = clamp(P.vx, -SLIDE_V, SLIDE_V);
+        } else {
+          var targetV = dir * MAXV;
+          var acc = P.onGround ? ACC : AIRACC;
+          var dv = targetV - P.vx;
+          if (Math.abs(dv) <= acc * dt) P.vx = targetV;
+          else P.vx += (dv > 0 ? 1 : -1) * acc * dt;
+          if (dir === 0) P.vx *= Math.pow(P.onGround ? 0.02 : 0.55, dt);
+        }
+      }
+
+      moveX(dt);
+
+      if (P.grapT > 0) {
+        /* крюк держит траекторию */
+      } else {
+        var pressWall = P.wallT > 0 && !P.onGround &&
+          ((P.wallDir > 0 && dir > 0) || (P.wallDir < 0 && dir < 0));
+        if (pressWall) {
+          if (!P.grip) { P.grip = true; P.wallRem = 0.5; }
+          if (P.wallRem > 0) {
+            P.wallRun = true;
+            P.wallRem -= dt;
+            P.vy = -140;
+          } else {
+            P.wallRun = false;
+            P.vy += GRAV * dt;
+          }
+        } else {
+          P.grip = false; P.wallRun = false;
+          P.vy += GRAV * dt;
+        }
+      }
+
+      moveY(dt);
+      P.wallT = Math.max(0, P.wallT - dt);
+      if (P.onGround) P.coyote = 0.12;
+      else P.coyote = Math.max(0, P.coyote - dt);
+
+      P.x = clamp(P.x, 10, WORLD - 20);
+
+      if (P.y > FLOOR) {
+        P.x = spawn.x; P.y = spawn.y - 1;
+        P.vx = 0; P.vy = 0; P.slide = 0; P.grapT = 0; P.grapple = null;
+        flashText = 'сорвался — вернул на платформу';
+        flashT = 1.2;
+        setMsg(flashText);
+      }
+
+      if (P.x > FINISH) finishRun();
+
+      if (timeOut && state === 'run') timeOut.textContent = timer.toFixed(2);
+
+      recT += dt;
+      if (recT >= 0.033 && rec.length < 3200) {
+        recT = 0;
+        rec.push([
+          Math.round(timer * 100) / 100,
+          Math.round(P.x * 10) / 10,
+          Math.round(P.y * 10) / 10,
+          P.slide > 0 ? 1 : 0
+        ]);
+      }
+    }
+
+    /* --- drawing --- */
+    var skyFar = [], skyNear = [];
+    for (var bi = 0; bi < 40; bi++) {
+      skyFar.push({ x: bi * 152 - 260, w: 88 + (bi * 37 % 74), h: 76 + (bi * 53 % 150) });
+      skyNear.push({ x: bi * 214 - 340, w: 118 + (bi * 41 % 96), h: 106 + (bi * 67 % 168) });
+    }
+
+    function drawSky(list, cam, color, baseY, par) {
+      ctx.fillStyle = color;
+      for (var i = 0; i < list.length; i++) {
+        var b = list[i];
+        var x = b.x - cam * par;
+        if (x + b.w < -120 || x > VW + 120) continue;
+        ctx.fillRect(x, baseY - b.h, b.w, b.h + 60);
+      }
+    }
+
+    function label(text, x, y, align) {
+      ctx.save();
+      ctx.font = '600 9px Consolas, monospace';
+      ctx.fillStyle = 'rgba(20,22,26,.5)';
+      ctx.textAlign = align || 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    function drawSolids() {
+      for (var i = 0; i < SOLIDS.length; i++) {
+        var s = SOLIDS[i];
+        if (s.x + s.w < camX() - 60 || s.x > camX() + VW + 60) continue;
+        if (s.kind === 'gate') {
+          ctx.fillStyle = INK;
+          ctx.fillRect(s.x, s.y, s.w, s.h);
+          ctx.save();
+          ctx.beginPath(); ctx.rect(s.x, s.y, s.w, s.h); ctx.clip();
+          ctx.strokeStyle = 'rgba(226,58,31,.85)';
+          ctx.lineWidth = 7;
+          for (var yy = s.y - s.w; yy < s.y + s.h + s.w; yy += 17) {
+            ctx.beginPath();
+            ctx.moveTo(s.x, yy + s.w);
+            ctx.lineTo(s.x + s.w, yy);
+            ctx.stroke();
+          }
+          ctx.restore();
+          label('SLIDE', s.x + s.w / 2, s.y - 9, 'center');
+        } else if (s.kind === 'wall') {
+          ctx.fillStyle = INK;
+          ctx.fillRect(s.x, s.y, s.w, s.h);
+          ctx.fillStyle = RED;
+          ctx.fillRect(s.x, s.y, s.w, 4);
+          ctx.save();
+          ctx.translate(s.x + s.w + 9, s.y + 6);
+          ctx.rotate(Math.PI / 2);
+          label('WALL-RUN', 0, 0, 'left');
+          ctx.restore();
+        } else {
+          ctx.fillStyle = INK;
+          ctx.fillRect(s.x, s.y, s.w, s.h);
+          ctx.fillStyle = RED;
+          ctx.fillRect(s.x, s.y, s.w, 3);
+        }
+      }
+    }
+
+    function drawAnchors() {
+      for (var i = 0; i < ANCHORS.length; i++) {
+        var a = ANCHORS[i];
+        var near = Math.sqrt((a.x - P.x) * (a.x - P.x) + (a.y - (P.y - 18)) * (a.y - (P.y - 18))) < 310;
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = near ? 2.4 : 1.4;
+        ctx.beginPath(); ctx.arc(a.x, a.y, near ? 8 : 6, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(a.x - 3, a.y); ctx.lineTo(a.x + 3, a.y);
+        ctx.moveTo(a.x, a.y - 3); ctx.lineTo(a.x, a.y + 3);
+        ctx.stroke();
+        if (near) label('E · КРЮК', a.x + 12, a.y - 8, 'left');
+      }
+    }
+
+    function drawFinishLine() {
+      ctx.save();
+      ctx.strokeStyle = RED;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([9, 9]);
+      ctx.beginPath();
+      ctx.moveTo(FINISH, 150);
+      ctx.lineTo(FINISH, 300);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = INK;
+      ctx.fillRect(FINISH - 30, 128, 60, 20);
+      ctx.fillStyle = PAPER;
+      ctx.font = '600 10px Consolas, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('ФИНИШ', FINISH, 142);
+      ctx.restore();
+    }
+
+    function drawRunner(x, y, hh, vx, air, sliding, phase, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 3.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.translate(x, y);
+
+      if (sliding) {
+        var sy = -hh;
+        ctx.beginPath();
+        ctx.moveTo(-8, sy * 0.55);
+        ctx.lineTo(6, sy * 0.32);
+        ctx.lineTo(20, -3);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-8, sy * 0.55);
+        ctx.lineTo(-14, sy * 0.2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(6, sy * 0.32);
+        ctx.lineTo(0, -2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(-16, sy * 0.58, 5.2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        var hipY = -hh * 0.46;
+        var shY = -hh * 0.86;
+        var lean = clamp(vx / 1500, -0.3, 0.3) * 10;
+        ctx.beginPath();
+        ctx.moveTo(0, hipY);
+        ctx.lineTo(lean, shY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(lean * 1.15, shY - 6, 5.3, 0, Math.PI * 2);
+        ctx.fill();
+        var s = Math.sin(phase), c = Math.cos(phase);
+        if (air) {
+          ctx.beginPath();
+          ctx.moveTo(0, hipY); ctx.lineTo(9, -9);
+          ctx.moveTo(0, hipY); ctx.lineTo(-8, -11);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(lean, shY + 3); ctx.lineTo(lean - 11, shY - 9);
+          ctx.moveTo(lean, shY + 3); ctx.lineTo(lean + 12, shY - 5);
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(0, hipY); ctx.lineTo(s * 13, -1);
+          ctx.moveTo(0, hipY); ctx.lineTo(-s * 13, -1);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(lean, shY + 3); ctx.lineTo(lean - c * 9, shY + 16);
+          ctx.moveTo(lean, shY + 3); ctx.lineTo(lean + c * 9, shY + 16);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    function ghostFrame(t) {
+      if (!best || !best.frames || !best.frames.length) return null;
+      var f = best.frames;
+      if (t <= f[0][0]) return f[0];
+      var lastIdx = f.length - 1;
+      if (t >= f[lastIdx][0]) return f[lastIdx];
+      var lo = 0, hi = lastIdx;
+      while (lo + 1 < hi) {
+        var mid = (lo + hi) >> 1;
+        if (f[mid][0] <= t) lo = mid; else hi = mid;
+      }
+      var a = f[lo], b = f[hi];
+      var k = (t - a[0]) / Math.max(0.001, b[0] - a[0]);
+      return [t, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, a[3]];
+    }
+
+    function drawGhost() {
+      if (!ghostOn || !best) return;
+      var t = state === 'done' ? Math.max(0, best.time) : timer;
+      var g = ghostFrame(t);
+      if (!g) return;
+      var hh = g[3] ? 18 : 36;
+      drawRunner(g[1], g[2], hh, 260, false, !!g[3], animT * 14, RED, 0.32);
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.fillStyle = RED;
+      ctx.font = '600 9px Consolas, monospace';
+      ctx.fillText('ПРИЗРАК ' + best.time.toFixed(2), g[1] - 30, g[2] - hh - 12);
+      ctx.restore();
+    }
+
+    function drawPlayer() {
+      var speed = Math.abs(P.vx);
+      var phase = animT * Math.max(3, speed / 26);
+      if (speed > 200 && P.onGround && P.slide <= 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = 2;
+        for (var i = 1; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(P.x - 16 - i * 9, P.y - 8 - i * 3);
+          ctx.lineTo(P.x - 4 - i * 9, P.y - 8 - i * 3);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      drawRunner(P.x, P.y, bodyH(), P.vx, !P.onGround, P.slide > 0, phase, INK, 1);
+    }
+
+    function draw() {
+      var cam = camX();
+      ctx.clearRect(0, 0, VW, VH);
+      var grad = ctx.createLinearGradient(0, 0, 0, VH);
+      grad.addColorStop(0, BASE);
+      grad.addColorStop(1, '#e6e0d6');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, VW, VH);
+
+      ctx.strokeStyle = 'rgba(20,22,26,.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var gx = -(cam % 120); gx < VW; gx += 120) {
+        ctx.moveTo(gx + 0.5, 0); ctx.lineTo(gx + 0.5, VH);
+      }
+      for (var gy = 0; gy < VH; gy += 120) {
+        ctx.moveTo(0, gy + 0.5); ctx.lineTo(VW, gy + 0.5);
+      }
+      ctx.stroke();
+
+      drawSky(skyFar, cam, '#e2dbd0', 400, 0.25);
+      drawSky(skyNear, cam, '#d4cbbd', 430, 0.5);
+
+      ctx.save();
+      ctx.translate(-cam, 0);
+      drawFinishLine();
+      drawSolids();
+      drawAnchors();
+      if (state === 'run' || state === 'done') drawGhost();
+      drawPlayer();
+      if (P.grapple) {
+        ctx.save();
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(P.x, P.y - 24);
+        ctx.lineTo(P.grapple.x, P.grapple.y);
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+
+      ctx.fillStyle = 'rgba(20,22,26,.13)';
+      ctx.fillRect(24, VH - 18, VW - 48, 3);
+      ctx.fillStyle = RED;
+      ctx.fillRect(24, VH - 18, (VW - 48) * clamp(P.x / FINISH, 0, 1), 3);
+      ctx.fillStyle = 'rgba(20,22,26,.45)';
+      ctx.font = '600 9px Consolas, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('БЕТОН-01 · 0 М', 24, VH - 26);
+      ctx.textAlign = 'right';
+      ctx.fillText('ФИНИШ 280 М', VW - 24, VH - 26);
+      ctx.textAlign = 'left';
+    }
+
+    var lastFrame = 0;
+    function loop(now) {
+      if (!lastFrame) lastFrame = now;
+      var dt = Math.min((now - lastFrame) / 1000, 1 / 30);
+      lastFrame = now;
+      update(dt);
+      draw();
+      window.requestAnimationFrame(loop);
+    }
+    window.requestAnimationFrame(loop);
+
+    /* --- controls --- */
+    var keys = { left: false, right: false };
+
+    window.addEventListener('keydown', function (e) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (t && (t.tagName === 'BUTTON' || t.tagName === 'A')) return;
+      var k = e.code;
+      if (k === 'ArrowLeft' || k === 'KeyA') { keys.left = true; e.preventDefault(); }
+      else if (k === 'ArrowRight' || k === 'KeyD') { keys.right = true; e.preventDefault(); }
+      else if (k === 'Space' || k === 'ArrowUp' || k === 'KeyW') {
+        e.preventDefault();
+        if (!e.repeat) jump();
+      } else if (k === 'ShiftLeft' || k === 'ShiftRight' || k === 'ArrowDown' || k === 'KeyS') {
+        e.preventDefault();
+        if (!e.repeat) startSlide();
+      } else if (k === 'KeyE') {
+        e.preventDefault();
+        if (!e.repeat) grapple();
+      } else if (k === 'KeyR') {
+        e.preventDefault();
+        reset(true);
+      }
+    }, { passive: false });
+
+    window.addEventListener('keyup', function (e) {
+      var k = e.code;
+      if (k === 'ArrowLeft' || k === 'KeyA') keys.left = false;
+      if (k === 'ArrowRight' || k === 'KeyD') keys.right = false;
+    });
+
+    window.addEventListener('blur', function () { keys.left = false; keys.right = false; });
+
+    if (startBtn) startBtn.addEventListener('click', function () {
+      begin();
+      try { canvas.focus({ preventScroll: true }); } catch (err) { canvas.focus(); }
+    });
+    if (resetBtn) resetBtn.addEventListener('click', function () {
+      reset(true);
+      try { canvas.focus({ preventScroll: true }); } catch (err) { canvas.focus(); }
+    });
+    if (ghostBtn) ghostBtn.addEventListener('click', function () {
+      ghostOn = !ghostOn;
+      ghostBtn.setAttribute('aria-pressed', ghostOn ? 'true' : 'false');
+      ghostBtn.textContent = ghostOn ? 'вкл' : 'выкл';
+    });
+
+    var touchPad = document.getElementById('touchPad');
+    if (touchPad) {
+      var btns = touchPad.querySelectorAll('button');
+      for (var ti = 0; ti < btns.length; ti++) {
+        (function (b) {
+          var key = b.getAttribute('data-key');
+          var press = function (e) {
+            e.preventDefault();
+            if (key === 'left') { keys.left = true; begin(); }
+            else if (key === 'right') { keys.right = true; begin(); }
+            else if (key === 'jump') jump();
+            else if (key === 'slide') startSlide();
+            else if (key === 'grapple') grapple();
+          };
+          var release = function () {
+            if (key === 'left') keys.left = false;
+            if (key === 'right') keys.right = false;
+          };
+          b.addEventListener('pointerdown', press);
+          b.addEventListener('pointerup', release);
+          b.addEventListener('pointercancel', release);
+          b.addEventListener('pointerleave', release);
+        })(btns[ti]);
+      }
+    }
+
+    function playFromStart() {
+      var demo = document.getElementById('demo');
+      if (demo) demo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.setTimeout(function () {
+        begin();
+        try { canvas.focus({ preventScroll: true }); } catch (err) { canvas.focus(); }
+      }, 450);
+    }
+    var ctas = ['heroPlay', 'topCta', 'finalPlay'];
+    for (var ci = 0; ci < ctas.length; ci++) {
+      var btn = document.getElementById(ctas[ci]);
+      if (btn) btn.addEventListener('click', playFromStart);
+    }
+
+    window.addEventListener('storage', function (e) {
+      if (e.key === KEY) { best = loadBest(); updateBest(); }
+    });
+  }
+
+  /* ================= 2. TRACK GENERATOR ================= */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  var genSvg = document.getElementById('genSvg');
+  var statLen = document.getElementById('statLen');
+  var statDrop = document.getElementById('statDrop');
+  var statHook = document.getElementById('statHook');
+  var statDiff = document.getElementById('statDiff');
+  var seedOut = document.getElementById('seedOut');
+  var genBtn = document.getElementById('genBtn');
+  var genSeed = 20290412;
+
+  function buildTrack(seed) {
+    var rnd = mulberry32(seed);
+    var blocks = [], x = 6, y = 200, drop = 0, hooks = 0;
+    for (var i = 0; i < 9; i++) {
+      var w = 40 + rnd() * 64;
+      var ny = clamp(y + (rnd() * 2 - 1) * 46, 94, 212);
+      var hasWall = rnd() < 0.2;
+      var hasHook = rnd() < 0.3;
+      blocks.push({ x: x, y: ny, w: w, wall: hasWall, hook: hasHook, hookY: ny - 58 });
+      if (hasHook) hooks++;
+      drop = Math.max(drop, Math.abs(ny - y));
+      x += w + 24 + rnd() * 48;
+      y = ny;
+    }
+    return { blocks: blocks, width: x, drop: drop, hooks: hooks };
+  }
+
+  function renderTrack(seed) {
+    if (!genSvg) return;
+    var t = buildTrack(seed);
+    var scale = Math.min(1, 560 / t.width);
+    var parts = [];
+    parts.push('<line x1="0" y1="240" x2="620" y2="240" stroke="#14161a" stroke-opacity=".14"/>');
+    var pts = [];
+    for (var i = 0; i < t.blocks.length; i++) {
+      var b = t.blocks[i];
+      var bx = 18 + b.x * scale;
+      var bw = Math.max(7, b.w * scale);
+      var by = b.y;
+      parts.push('<rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + bw.toFixed(1) +
+        '" height="' + (246 - by).toFixed(1) + '" fill="#14161a"/>');
+      parts.push('<rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + bw.toFixed(1) +
+        '" height="3" fill="#e23a1f"/>');
+      if (b.wall) {
+        parts.push('<rect x="' + (bx + bw - 5).toFixed(1) + '" y="' + (by - 44).toFixed(1) +
+          '" width="5" height="44" fill="#14161a" opacity=".72"/>');
+      }
+      if (b.hook) {
+        parts.push('<circle cx="' + (bx + bw / 2).toFixed(1) + '" cy="' + b.hookY.toFixed(1) +
+          '" r="4.5" fill="none" stroke="#e23a1f" stroke-width="2"/>');
+        parts.push('<line x1="' + (bx + bw / 2).toFixed(1) + '" y1="' + b.hookY.toFixed(1) +
+          '" x2="' + (bx + bw / 2).toFixed(1) + '" y2="' + (by - 8).toFixed(1) +
+          '" stroke="#e23a1f" stroke-width="1" stroke-dasharray="2 4" opacity=".7"/>');
+      }
+      pts.push((bx + bw / 2).toFixed(1) + ',' + (by - 7).toFixed(1));
+    }
+    parts.push('<polyline points="' + pts.join(' ') +
+      '" fill="none" stroke="#e23a1f" stroke-width="1.6" stroke-dasharray="5 6" opacity=".8"/>');
+    parts.push('<text x="18" y="26" font-family="Consolas, monospace" font-size="10" letter-spacing="1.5" fill="#6b6862">ПРОЦЕДУРНАЯ ТРАССА</text>');
+    genSvg.innerHTML = parts.join('');
+
+    var lenM = Math.round(t.width * 0.34);
+    var dropM = Math.round(t.drop * 0.11);
+    var diff = clamp(Math.round(1 + dropM / 4 + t.hooks / 2), 1, 5);
+    if (statLen) statLen.textContent = lenM + ' м';
+    if (statDrop) statDrop.textContent = dropM + ' м';
+    if (statHook) statHook.textContent = t.hooks;
+    if (statDiff) statDiff.textContent = new Array(diff + 1).join('★') + new Array(6 - diff).join('☆');
+    if (seedOut) seedOut.textContent = 'AR-' + seed.toString(36).toUpperCase().slice(-4);
+  }
+
+  renderTrack(genSeed);
+  if (genBtn) genBtn.addEventListener('click', function () {
+    genSeed = Math.floor(Math.random() * 1679615);
+    renderTrack(genSeed);
+  });
+
+  /* ================= 3. LEADERBOARD ================= */
+  var BOARDS = {
+    day: [
+      ['sneakers_kms', 'Бетон-01', '12.84', '2380'],
+      ['roof_vera', 'Северный склон', '13.10', '2210'],
+      ['k.ton', 'Бетон-01', '13.42', '2190'],
+      ['mitia_hop', 'Трубы-03', '13.55', '2050'],
+      ['zebra_run', 'Северный склон', '13.97', '1990'],
+      ['pole_nick', 'Бетон-01', '14.02', '1980']
+    ],
+    season: [
+      ['roof_vera', 'Сезон 04', '11.96', '18450'],
+      ['sneakers_kms', 'Сезон 04', '12.02', '17980'],
+      ['k.ton', 'Сезон 04', '12.31', '16740'],
+      ['stena_maks', 'Сезон 04', '12.44', '15920'],
+      ['mitia_hop', 'Сезон 04', '12.58', '15010'],
+      ['pole_nick', 'Сезон 04', '12.77', '14330']
+    ],
+    friends: [
+      ['sneakers_kms', 'Бетон-01', '12.84', '2380'],
+      ['roof_vera', 'Бетон-01', '13.10', '2210'],
+      ['ты', 'Бетон-01', '15.62', '1420', 1]
+    ]
+  };
+  var boardBody = document.getElementById('boardBody');
+  var tabButtons = document.querySelectorAll('.board-tabs button');
+
+  function renderBoard(key) {
+    if (!boardBody) return;
+    var rows = BOARDS[key] || [];
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      html += '<tr' + (r[4] ? ' class="me"' : '') + '>' +
+        '<td><span class="rk">' + ('0' + (i + 1)).slice(-2) + '</span></td>' +
+        '<td>' + r[0] + '</td>' +
+        '<td>' + r[1] + '</td>' +
+        '<td class="num">' + r[2] + '</td>' +
+        '<td class="num">' + r[3] + '</td>' +
+        '</tr>';
+    }
+    boardBody.innerHTML = html;
+  }
+  renderBoard('day');
+
+  for (var tbi = 0; tbi < tabButtons.length; tbi++) {
+    (function (btn) {
+      btn.addEventListener('click', function () {
+        for (var j = 0; j < tabButtons.length; j++) {
+          tabButtons[j].setAttribute('aria-selected', tabButtons[j] === btn ? 'true' : 'false');
+        }
+        renderBoard(btn.getAttribute('data-board'));
+      });
+    })(tabButtons[tbi]);
+  }
+
+  /* ================= 4. DAILY RESET CLOCK ================= */
+  var clockEl = document.getElementById('resetClock');
+  function msToReset() {
+    var day = 86400000;
+    var msk = Date.now() + 3 * 3600000;
+    var inDay = ((msk % day) + day) % day;
+    var rem = 3 * 3600000 - inDay;
+    if (rem <= 0) rem += day;
+    return rem;
+  }
+  function tickClock() {
+    if (!clockEl) return;
+    var total = Math.floor(msToReset() / 1000);
+    var h = Math.floor(total / 3600);
+    var m = Math.floor((total % 3600) / 60);
+    var s = total % 60;
+    clockEl.textContent = ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2) + ':' + ('0' + s).slice(-2);
+  }
+  tickClock();
+  window.setInterval(tickClock, 1000);
+
+  /* ================= 5. SKIN CUSTOMIZER ================= */
+  var skTorso = document.getElementById('skTorso');
+  var skLegs = document.getElementById('skLegs');
+  var skArms = document.getElementById('skArms');
+  var skStripe = document.getElementById('skStripe');
+  var skHead = document.getElementById('skHead');
+  var skHelm = document.getElementById('skHelm');
+  var skTrail = document.getElementById('skTrail');
+  var suitBtns = document.querySelectorAll('#suitSwatches .swatch');
+  var trailBtns = document.querySelectorAll('#trailOpts .opt');
+  var helmBtns = document.querySelectorAll('#helmOpts .opt');
+
+  function applySuit(color) {
+    if (skTorso) skTorso.setAttribute('fill', color);
+    if (skLegs) skLegs.setAttribute('stroke', color);
+    if (skArms) skArms.setAttribute('stroke', color);
+    if (skHead) skHead.setAttribute('stroke', color);
+    var light = (color === '#c9c1b3');
+    if (skStripe) skStripe.setAttribute('stroke', light ? '#14161a' : '#e23a1f');
+    if (skHelm) skHelm.setAttribute('fill', color);
+  }
+
+  for (var si = 0; si < suitBtns.length; si++) {
+    (function (b) {
+      b.addEventListener('click', function () {
+        for (var k = 0; k < suitBtns.length; k++) {
+          suitBtns[k].setAttribute('aria-pressed', suitBtns[k] === b ? 'true' : 'false');
+        }
+        applySuit(b.getAttribute('data-suit'));
+      });
+    })(suitBtns[si]);
+  }
+
+  for (var pi = 0; pi < trailBtns.length; pi++) {
+    (function (b) {
+      b.addEventListener('click', function () {
+        for (var k = 0; k < trailBtns.length; k++) {
+          trailBtns[k].setAttribute('aria-pressed', trailBtns[k] === b ? 'true' : 'false');
+        }
+        var mode = b.getAttribute('data-trail');
+        if (!skTrail) return;
+        if (mode === 'none') {
+          skTrail.setAttribute('opacity', '0');
+        } else if (mode === 'dust') {
+          skTrail.setAttribute('stroke', '#b0a698');
+          skTrail.setAttribute('opacity', '.55');
+          skTrail.removeAttribute('stroke-dasharray');
+        } else {
+          skTrail.setAttribute('stroke', '#e23a1f');
+          skTrail.setAttribute('opacity', '.45');
+          skTrail.removeAttribute('stroke-dasharray');
+        }
+      });
+    })(trailBtns[pi]);
+  }
+
+  for (var hi = 0; hi < helmBtns.length; hi++) {
+    (function (b) {
+      b.addEventListener('click', function () {
+        for (var k = 0; k < helmBtns.length; k++) {
+          helmBtns[k].setAttribute('aria-pressed', helmBtns[k] === b ? 'true' : 'false');
+        }
+        var on = b.getAttribute('data-helm') === '1';
+        if (skHelm) skHelm.setAttribute('opacity', on ? '1' : '0');
+      });
+    })(helmBtns[hi]);
+  }
+})();
+</script>
+</body>
+</html>

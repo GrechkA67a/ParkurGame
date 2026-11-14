@@ -1,0 +1,10 @@
+[
+  {"type":"click","selector":"a[href='#demo']"},
+  {"type":"click","selector":"#startBtn"},
+  {"type":"focus","selector":"#course"},
+  {"type":"key","key":"ArrowRight"},
+  {"type":"click","selector":"a[href='#tracks']"},
+  {"type":"click","selector":"a[href='#challenges']"},
+  {"type":"click","selector":"a[href='#skins']"},
+  {"type":"click","selector":"a[href='#coop']"}
+]
